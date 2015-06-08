@@ -2,12 +2,13 @@
 #include "Adafruit_GFX.h"
 #include <application.h>
 
-#define OLED_MOSI  A5
-#define OLED_CLK   A3
+#define OLED_MOSI  A5 // HW SPI
+#define OLED_CLK   A3 // HW SPI
 #define OLED_DC    D3
 #define OLED_CS    D4
 #define OLED_RESET D5
-Adafruit_SSD1306 display(OLED_MOSI, OLED_CLK, OLED_DC, OLED_RESET, OLED_CS);
+// Hardware SPI
+Adafruit_SSD1306 display(OLED_DC, OLED_RESET, OLED_CS);
 
 #define BITMAP_WIDTH 38 // Nbr chars
 static const uint8_t bitmap_bits[] = {
@@ -251,7 +252,7 @@ void loop() {
 		cnt++;
 	}
 	if (step == 3) {
-		delay(3000);
+		delay(100);
 		cnt = 0;
 		step = 1;
 	}
