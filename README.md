@@ -21,3 +21,7 @@ Also contains Particle Core ports of the following libraries.
 
 * [Adafruit_SSD1306](https://github.com/adafruit/Adafruit_SSD1306)
 * [Adafruit_GFX](https://github.com/adafruit/Adafruit-GFX-Library)
+
+
+![Image of the enclosure]
+(https://github.com/fesse/oled-large-scroll/blob/master/images/enclosure.jpg)
