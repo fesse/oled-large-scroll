@@ -1,0 +1,7 @@
+.body {
+  margin-left: 10px;
+}
+.canvas {
+   border: 1px solid black;
+   cursor: default;
+ }
