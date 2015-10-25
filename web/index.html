@@ -9,10 +9,14 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
   </head>
-  <body onload="oled.init()" class="body">
+  <body onload="oled.init('<DEVICEID>','<TOKEN>')" class="body">
     <h1>OLED Monitor drawing tool</h1>
 
     <canvas id="canvas" class="canvas" width="1024" height="512"></canvas>
+
+    <div>
+    <button class="btn btn-default" type="button" onclick="oled.clear()">Clear</button>
+  </div>
 
     <script src="script.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>

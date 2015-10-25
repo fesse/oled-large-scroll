@@ -10,6 +10,10 @@
 // Hardware SPI
 Adafruit_SSD1306 display(OLED_DC, OLED_RESET, OLED_CS);
 
+// Publish function
+int res1 = Particle.function("draw", inetDraw);
+int res2 = Particle.function("clear", inetClear);
+
 #define BITMAP_WIDTH 38 // Nbr chars
 static const uint8_t bitmap_bits[] = {
    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -218,22 +222,57 @@ static const uint8_t bitmap_bits[] = {
 
 uint16_t cnt;
 uint8_t step;
+uint8_t drawMode;
+unsigned long TTL = 60000;
+unsigned long drawTime;
 
 void setup() {
 	Serial.begin(9600);
 
+  // Clear the buffer.
 	display.begin(SSD1306_SWITCHCAPVCC);
-	
-	// Clear the buffer.
 	display.clearDisplay();
 	display.display();
 
 	step = 1;
 	cnt = 0;
+  drawTime = 0;
+}
+
+int inetDraw(String data) {
+  while(data.length() > 0) {
+    int x = data.substring(0, 3).toInt();
+    int y = data.substring(3, 5).toInt();
+    int value = data.substring(5,6).toInt();
+    display.drawPixel(x,y,value);
+    data = data.substring(6);
+  }
+  setDrawMode();
+  display.display();
+  return 1;
+}
+
+int inetClear(String notUsed) {
+  setDrawMode();
+  display.clearDisplay();
+  display.display();
+}
+
+void setDrawMode() {
+  drawTime = millis();
+  step = 1;
+  cnt = 0;
 }
 
 void loop() {
-	if (step == 1) {
+  if (drawTime > 0 && drawTime + TTL > millis()) {
+    delay(1000);
+    return;
+  }
+
+  delay(5);
+
+  if (step == 1) {
 		if (cnt == BITMAP_WIDTH*8) {
 			cnt = 0;
 			step = 2;
@@ -252,7 +291,7 @@ void loop() {
 		cnt++;
 	}
 	if (step == 3) {
-		delay(100);
+		delay(3000);
 		cnt = 0;
 		step = 1;
 	}
@@ -271,7 +310,7 @@ void drawBlackFrame() {
 
 void drawColumn(int16_t x) {
 	uint8_t y, data;
-	
+
 	for (y=0; y<SSD1306_LCDHEIGHT; y++){
 		data = bitmap_bits[(x/8) + y * BITMAP_WIDTH] & 1<<x%8;
 		display.drawPixel(SSD1306_LCDWIDTH-1, y, data>0?1:0);

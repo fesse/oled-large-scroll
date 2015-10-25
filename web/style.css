@@ -1,7 +1,10 @@
 .body {
   margin-left: 10px;
 }
+.button {
+  display: block;
+}
 .canvas {
-   border: 1px solid black;
-   cursor: default;
+  border: 1px solid black;
+  cursor: default;
  }
