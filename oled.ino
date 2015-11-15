@@ -488,9 +488,35 @@ void loop() {
         }
         delay(5);
         if (updateTime()) {
-                display.clearDisplay();
+                uint8_t a;
+                for (a=0; a <64; a++) {
+                        display.shiftDisplayDown(3,24);
+                        display.display();
+                        delay(5);
+                }
+                for (a=0; a <64; a++) {
+                        display.shiftDisplayDown(31,24);
+                        display.display();
+                        delay(5);
+                }
+                for (a=0; a <64; a++) {
+                        display.shiftDisplayDown(60,8);
+                        display.display();
+                        delay(5);
+                }
+                for (a=0; a <64; a++) {
+                        display.shiftDisplayDown(72,24);
+                        display.display();
+                        delay(5);
+                }
+                for (a=0; a <64; a++) {
+                        display.shiftDisplayDown(100,24);
+                        display.display();
+                        delay(5);
+                }
                 drawClock();
         }
+        delay(2000);
 //        scrollNetset();
 }
 

@@ -662,9 +662,46 @@ void Adafruit_SSD1306::shiftDisplayLeft(){
   uint8_t y;
   register uint8_t *pBuf = buffer;
 
-  for (y=1; y <SSD1306_LCDHEIGHT/8; y++) {
+  for (y=0; y<SSD1306_LCDHEIGHT/8; y++) {
     memmove(pBuf, pBuf+1, SSD1306_LCDWIDTH-1);
     pBuf += SSD1306_LCDWIDTH;
   }
-  memmove(pBuf, pBuf+1, SSD1306_LCDWIDTH-1);
 }
+
+void Adafruit_SSD1306::shiftDisplayDown(uint8_t x, uint8_t width){
+  uint8_t index;
+  uint8_t y;
+  register uint8_t *pBuf = buffer;
+
+  pBuf += x;
+  for (index=0; index < width ; index++) {
+    uint8_t bit;
+    uint8_t nextBit;
+    bit = 0;
+    nextBit = 0;
+    for (y=0; y<SSD1306_LCDHEIGHT/8; y++) {
+      nextBit = *pBuf&128;
+      *pBuf = *pBuf<<1;
+      if (bit > 0) {
+        *pBuf = *pBuf|1;
+      }
+      bit = nextBit;
+      pBuf += SSD1306_LCDWIDTH;
+    }
+    pBuf -= SSD1306_LCDWIDTH*8;
+    pBuf += 1;
+  }
+}
+
+/**
+void Adafruit_SSD1306::dbg(uint8_t *pBuf){
+  Serial.print("pBuf=");
+  Serial.print((long)pBuf);
+  Serial.print(" : ");
+  uint8_t i;
+  for (i=8; i>0; i--) {
+    Serial.print(*pBuf&(1<<i)>0?"1":"0");
+  }
+  Serial.print("\n");
+}
+*/
