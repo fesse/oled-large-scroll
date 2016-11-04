@@ -447,7 +447,7 @@ void setup() {
         cnt = 0;
         drawTime = 0;
 
-        Time.zone(2);
+        Time.zone(1);
 
         drawBootScreen();
         delay(6000);
