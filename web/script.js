@@ -151,6 +151,7 @@ oled = function() {
     initData();
     initListeners();
     initScanTimer();
+    clearCanvas();
     sendData();
   }
 
