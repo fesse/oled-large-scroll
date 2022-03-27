@@ -1,0 +1,5 @@
+{
+    "particle.firmwareVersion": "3.2.0",
+    "particle.targetPlatform": "photon",
+    "particle.targetDevice": "OLED_Display"
+}

@@ -1,3 +1,8 @@
+/******************************************************/
+//       THIS IS A GENERATED FILE - DO NOT EDIT       //
+/******************************************************/
+
+#line 1 "/home/mathias/private/oled-large-scroll/oled.ino"
 #include <application.h>
 
 #include "Adafruit_GFX.h"
@@ -5,6 +10,32 @@
 #include "oled_graphics.h"
 
 // Hardware SPI
+void setup();
+void timeout();
+void solarPowerHandler(const char *event, const char *data);
+void setMode(uint8_t mode);
+int getMode();
+void updateMode();
+int inetDraw(String data);
+int inetClear(String notUsed);
+void loop();
+void displaySolarEffect();
+void toggleColon();
+void displayClock();
+void updateClock();
+void scrollClockNumber(uint16_t number, uint16_t xPos);
+void scrollNetset();
+void drawBootScreen();
+void clearDown();
+void drawFrame(uint16_t cnt);
+void drawBlackFrame();
+void drawColumn(int16_t x);
+void drawNumberOnFirstRow(int16_t number, int16_t bitmapY, int16_t screenX);
+void drawNumberOnLastRow(int16_t number, int16_t bitmapY, int16_t screenX);
+void updateTime();
+void drawColon();
+void clearColon();
+#line 8 "/home/mathias/private/oled-large-scroll/oled.ino"
 #define OLED_DC D3
 #define OLED_CS D4
 #define OLED_RESET D5
