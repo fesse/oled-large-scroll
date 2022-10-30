@@ -79,6 +79,7 @@ void setup() {
    display.display();
 
    Time.zone(1);
+   Time.setDSTOffset(0);
    Time.beginDST();
    setMode(MODE_BOOT);
 }
