@@ -37,6 +37,7 @@ Adafruit_SSD1306 display(OLED_DC, OLED_RESET, OLED_CS);
 
 #define DRAW_TIMEOUT 60000
 #define BOOTSCREEN_TIMEOUT 3000
+#define SOLAR_NEW_VALUE_TIMEOUT 300000
 #define SCROLL_TIMEOUT 1000
 #define SOLAR_TIMEOUT 10000
 
@@ -46,6 +47,7 @@ Adafruit_SSD1306 display(OLED_DC, OLED_RESET, OLED_CS);
 
 boolean colon;
 boolean dirty;
+boolean callWebHook;
 
 uint8_t hour;
 uint8_t minute;
@@ -62,6 +64,7 @@ uint16_t solarPower = 0;
 
 Timer colonTimer(1000, toggleColon);
 Timer timeoutTimer(BOOTSCREEN_TIMEOUT, timeout);
+Timer solarTimer(SOLAR_NEW_VALUE_TIMEOUT, signalWebHookTime);
 
 void setup() {
    // Publish functions to internet
@@ -78,21 +81,29 @@ void setup() {
    display.clearDisplay();
    display.display();
 
-   Time.zone(1);
-   Time.setDSTOffset(0);
-   Time.beginDST();
+   solarTimer.start();
+
+   syncTime();
    setMode(MODE_BOOT);
 }
 
+
+void signalWebHookTime() {
+   callWebHook = true;
+}
+
 void timeout() {
+   signalWebHookTime();
    setMode(MODE_CLOCK);
 }
 
 void solarPowerHandler(const char *event, const char *data) {
-   solarPower = atoi(data);
-   if (solarPower > 0) {
-      setMode(MODE_SOLAR);
+   uint16_t newSolarPower = atoi(data);
+   if (newSolarPower == solarPower) {
+      return;
    }
+   solarPower = newSolarPower;
+   setMode(MODE_SOLAR);
 }
 
 void setMode(uint8_t mode) {
@@ -165,6 +176,11 @@ int inetClear(String notUsed) {
 
 void loop() {
    updateMode();
+
+   if (callWebHook) {
+      Particle.publish("getSolarEffect", PRIVATE);
+      callWebHook = false;
+   }
 
    if (currentMode == MODE_CLOCK) {
       delay(50);
@@ -419,4 +435,55 @@ void drawColon() {
 
 void clearColon() {
    display.drawRect(CLOCK_COLON_X, CLOCK_COLON_Y, COLON_WIDTH, COLON_HEIGHT, 0);
+}
+
+void syncTime() {
+   Particle.syncTime();
+   waitUntil(Particle.syncTimeDone);
+   Time.zone(1);
+   adjustForDST();
+}
+
+void adjustForDST(){
+   int month = Time.month();
+   int dayOfMonth = Time.day();
+   int dayOfWeek = Time.weekday() - 1;
+   int hour = Time.hour();
+   bool shouldDSTbeEnabled = false;
+   switch (month) {
+      case 1:
+      case 2:
+      case 11:
+      case 12:
+         shouldDSTbeEnabled = false;
+         break;
+      case 4:
+      case 5:
+      case 6:
+      case 7:
+      case 8:
+      case 9:
+         shouldDSTbeEnabled = true;
+         break;
+      case 10:
+      case 3:
+         if (!(dayOfMonth - dayOfWeek > 24)) {
+            shouldDSTbeEnabled = (month == 10);
+         } else if (dayOfWeek > 0) {
+            shouldDSTbeEnabled = (month == 3);
+         } else {
+            if (hour >= 1 && month == 3) {
+               shouldDSTbeEnabled = true;
+            } else if (hour >= 2 && month == 10) {
+               shouldDSTbeEnabled = false;
+            }
+         }
+         break;
+   }
+
+   if (shouldDSTbeEnabled && !Time.isDST()) {
+      Time.beginDST();
+   } else if (!shouldDSTbeEnabled && Time.isDST()) {
+      Time.endDST();
+   }
 }
